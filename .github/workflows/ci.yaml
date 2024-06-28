@@ -61,6 +61,7 @@ jobs:
         with:
           name: coffee-image
           path: /tmp/coffee.tar
+          retention-days: 1
 
   docker_publish:
     name: Publish image
