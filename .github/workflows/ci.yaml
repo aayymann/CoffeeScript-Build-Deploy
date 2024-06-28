@@ -1,0 +1,91 @@
+name: Coffeescript Build
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  transpile:
+    name: Transpile to ES5
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Transpile
+        run: npm run transpile
+
+      - name: Compress dist output
+        run: tar czvf /tmp/coffee-dist.tar dist
+
+      - name: Upload JS files
+        uses: actions/upload-artifact@v4
+        with:
+          name: coffee-js-files
+          path: /tmp/coffee-dist.tar
+          retention-days: 1
+
+  docker_build:
+    name: Build image
+    runs-on: ubuntu-22.04
+    needs: transpile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download transpiled code
+        uses: actions/download-artifact@v4
+        with:
+          name: coffee-js-files
+
+      - name: Decompress transpiled code
+        run: tar -xvf coffee-dist.tar
+
+      - name: Docker build image
+        run: docker build -t coffee:latest .
+
+      - name: Docker save image
+        run: docker save coffee > /tmp/coffee.tar
+
+      - name: Upload docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coffee-image
+          path: /tmp/coffee.tar
+
+  docker_publish:
+    name: Publish image
+    runs-on: ubuntu-22.04
+    needs: docker_build
+    steps:
+      - name: Inject variables
+        uses: rlespinasse/github-slug-action@v4
+
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: coffee-image
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load --input /tmp/coffee.tar
+
+      - name: Docker tag images
+        run: |
+          docker tag coffee ghcr.io/${{secrets.GHCR_USERNAME}}/coffee:latest
+          docker tag coffee ghcr.io/${{secrets.GHCR_USERNAME}}/coffee:${{env.GITHUB_SHA_SHORT}}
+
+      - name: Docker push images
+        run: |
+          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+          docker push ghcr.io/${{secrets.GHCR_USERNAME}}/coffee:latest
+          docker push ghcr.io/${{secrets.GHCR_USERNAME}}/coffee:${{env.GITHUB_SHA_SHORT}}
