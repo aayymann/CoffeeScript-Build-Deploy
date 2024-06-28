@@ -1,0 +1,12 @@
+{
+	"presets": [
+		[
+			"@babel/preset-env",
+			{
+				"targets": {
+					"ie": "10" // IE version 10 fully supported ES5 with no support to ES6/ECMAScript2015
+				}
+			}
+		]
+	]
+}

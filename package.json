@@ -1,0 +1,28 @@
+{
+	"name": "coffeescript",
+	"version": "1.0.0",
+	"description": "Build and Deploy mini project for coffeescript code",
+	"main": "index.js",
+	"scripts": {
+		"coffee-transpile": "coffee --no-header -c src/index.coffee",
+		"babel-transpile": "babel src -d dist/index.js",
+		"transpile": "npm run coffee-transpile && npm run babel-transpile",
+		"start": "node src/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/aayymann/CoffeeScript-Build-Deploy.git"
+	},
+	"author": "Ahmed Ayman",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/aayymann/CoffeeScript-Build-Deploy/issues"
+	},
+	"homepage": "https://github.com/aayymann/CoffeeScript-Build-Deploy#readme",
+	"devDependencies": {
+		"@babel/cli": "^7.24.7",
+		"@babel/core": "^7.24.7",
+		"@babel/preset-env": "^7.24.7",
+		"coffeescript": "^2.7.0"
+	}
+}
