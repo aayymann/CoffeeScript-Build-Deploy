@@ -6,7 +6,7 @@
 	"scripts": {
 		"coffee-transpile": "coffee --no-header -c src/index.coffee",
 		"babel-transpile": "babel src -d dist/index.js",
-		"transpile": "npm run coffee-transpile && npm run babel-transpile",
+		"transpile": "node src/esbuilder.js",
 		"start": "node src/index.js"
 	},
 	"repository": {
@@ -23,6 +23,7 @@
 		"@babel/cli": "^7.24.7",
 		"@babel/core": "^7.24.7",
 		"@babel/preset-env": "^7.24.7",
-		"coffeescript": "^2.7.0"
+		"coffeescript": "^2.7.0",
+		"esbuild-coffeescript": "^2.2.0"
 	}
 }
